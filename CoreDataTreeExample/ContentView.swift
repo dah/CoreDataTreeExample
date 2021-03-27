@@ -19,7 +19,12 @@ struct ContentView: View {
     var body: some View {
         List {
             ForEach(items) { item in
-                Text("Item at \(item.timestamp!, formatter: itemFormatter)")
+                HStack {
+                    Button(action: { self.addChild(item)}) {
+                        Label("Add Child", systemImage: "plus")
+                    }
+                    Text("Item at \(item.timestamp!, formatter: itemFormatter) : \(item.children?.count ?? 0) children")
+                }
             }
             .onDelete(perform: deleteItems)
         }
@@ -35,6 +40,22 @@ struct ContentView: View {
             let newItem = Item(context: viewContext)
             newItem.timestamp = Date()
 
+            do {
+                try viewContext.save()
+            } catch {
+                // Replace this implementation with code to handle the error appropriately.
+                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                let nsError = error as NSError
+                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            }
+        }
+    }
+    
+    private func addChild(_ parent: Item) {
+        withAnimation {
+            let newItem = Item(context: viewContext)
+            newItem.timestamp = Date()
+            newItem.parent = parent
             do {
                 try viewContext.save()
             } catch {
